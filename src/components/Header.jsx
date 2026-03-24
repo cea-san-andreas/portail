@@ -1,8 +1,21 @@
-import { Download, Upload, Plus, Moon, Sun, Home } from 'lucide-react';
+import { Download, Upload, Plus, Moon, Sun, Home, Maximize, Minimize } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { useTheme } from '../hooks/useTheme';
+import HeaderClock from './HeaderClock';
 
 export default function Header({ onExport, onImport, onAdd, onShowLanding }) {
   const { dark, toggle } = useTheme();
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen?.();
+      setIsFullscreen(false);
+    }
+  }, []);
 
   return (
     <header className="sticky top-0 z-50">
@@ -16,7 +29,7 @@ export default function Header({ onExport, onImport, onAdd, onShowLanding }) {
             <div className="relative">
               <div className="absolute -inset-1 bg-copper/25 rounded-full blur-md max-lg:landscape:hidden" />
               <img
-                src="/logo-san-andreas.png"
+                src={`${import.meta.env.BASE_URL}logo-san-andreas.png`}
                 alt="State of San Andreas"
                 className="relative w-12 h-12 sm:w-14 sm:h-14 max-lg:landscape:w-10 max-lg:landscape:h-10 shrink-0 drop-shadow-[0_2px_8px_rgba(184,115,51,0.5)]"
               />
@@ -38,14 +51,16 @@ export default function Header({ onExport, onImport, onAdd, onShowLanding }) {
             <div className="relative hidden md:block">
               <div className="absolute -inset-1 bg-copper/25 rounded-full blur-md" />
               <img
-                src="/logo-cea.png"
+                src={`${import.meta.env.BASE_URL}logo-cea.png`}
                 alt="C.E.A"
                 className="relative w-14 h-14 shrink-0 drop-shadow-[0_2px_8px_rgba(184,115,51,0.5)]"
               />
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 sm:gap-2.5 justify-end w-full md:w-auto max-lg:landscape:gap-1 max-lg:landscape:flex-nowrap max-lg:landscape:overflow-x-auto max-lg:landscape:pb-0.5 max-lg:landscape:-mr-1 scrollbar-thin">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2.5 justify-end w-full md:w-auto items-center max-lg:landscape:gap-1 max-lg:landscape:flex-nowrap max-lg:landscape:overflow-x-auto max-lg:landscape:pb-0.5 max-lg:landscape:-mr-1 scrollbar-thin">
+            <HeaderClock />
+
             {onShowLanding && (
               <button
                 type="button"
@@ -67,6 +82,15 @@ export default function Header({ onExport, onImport, onAdd, onShowLanding }) {
             >
               {dark ? <Sun className="w-4 h-4 text-white" /> : <Moon className="w-4 h-4 text-white" />}
               <span className="hidden lg:inline max-lg:landscape:hidden">{dark ? 'Clair' : 'Sombre'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="header-btn-secondary inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 max-lg:landscape:px-2 max-lg:landscape:py-1.5 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-200 cursor-pointer !text-white shrink-0"
+              title={isFullscreen ? 'Quitter le plein écran' : 'Plein écran (F11)'}
+            >
+              {isFullscreen ? <Minimize className="w-4 h-4 text-white" /> : <Maximize className="w-4 h-4 text-white" />}
             </button>
 
             <button

@@ -535,7 +535,7 @@ export default function GuidePage() {
       <nav className="lg:w-64 shrink-0">
         <div className="bg-card border border-border rounded-xl overflow-hidden sticky top-24">
           <div className="bg-primary px-4 py-3 flex items-center gap-2">
-            <img src="/logo-cea.png" alt="" className="w-8 h-8" />
+            <img src={`${import.meta.env.BASE_URL}logo-cea.png`} alt="" className="w-8 h-8" />
             <div>
               <h3 className="text-sm font-bold text-white">Guide des procédures</h3>
               <p className="text-xs text-white/60">Navigation par chapitre</p>

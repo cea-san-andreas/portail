@@ -5,6 +5,7 @@ export default function SearchFilters({
   categoryFilter, setCategoryFilter, categories,
   typeFilter, setTypeFilter, types,
   statusFilter, setStatusFilter, statuses,
+  searchRef,
 }) {
   const hasFilters = search || categoryFilter !== 'Toutes' || typeFilter !== 'Tous' || statusFilter !== 'Tous';
 
@@ -25,6 +26,7 @@ export default function SearchFilters({
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-light" />
           <input
+            ref={searchRef}
             type="text"
             placeholder="Rechercher un document, une catégorie, un tag..."
             value={search}

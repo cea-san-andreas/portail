@@ -9,7 +9,7 @@ export default function StatCard({ title, value, icon: Icon, index = 0 }) {
   const gradient = GRADIENTS[index % GRADIENTS.length];
 
   return (
-    <div className="relative bg-card rounded-xl sm:rounded-2xl border border-border p-3 sm:p-5 max-lg:landscape:p-2.5 shadow-sm hover:shadow-lg transition-all duration-300 group overflow-hidden">
+    <div className="relative bg-card rounded-xl sm:rounded-2xl border border-border p-3 sm:p-5 max-lg:landscape:p-2.5 shadow-sm hover:shadow-lg transition-all duration-300 group overflow-hidden card-hover">
       <div className={`absolute top-0 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r ${gradient} opacity-80`} />
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
