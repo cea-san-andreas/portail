@@ -186,9 +186,9 @@ export default function WelcomePage({ onEnter }) {
         <div className="relative h-px max-w-4xl mx-auto px-4 bg-gradient-to-r from-transparent via-border to-transparent dark:via-white/10" />
 
         {/* Galerie photos (liste figée dans le code — non modifiable depuis l’app) */}
-        <section className="relative py-12 md:py-16 px-4 max-lg:landscape:py-8" aria-label="Galerie">
+        <section className="relative py-8 md:py-12 px-4 max-lg:landscape:py-6" aria-label="Galerie">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8 md:mb-10 max-lg:landscape:mb-5">
+            <div className="text-center mb-5 md:mb-6 max-lg:landscape:mb-4">
               <p className="text-xs font-bold uppercase tracking-[0.3em] text-copper mb-3">En images</p>
               <h2 className="text-2xl md:text-3xl font-extrabold text-primary tracking-tight">
                 Le portail en un coup d’œil
