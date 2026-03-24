@@ -352,6 +352,10 @@ function ListItem({ item, listId, color, onToggle, onRemove, onEdit }) {
         }
       </button>
 
+      {item.icon && (
+        <span className="text-lg shrink-0 select-none" title={item.text}>{item.icon}</span>
+      )}
+
       {editing ? (
         <input
           type="text"
