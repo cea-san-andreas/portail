@@ -67,7 +67,9 @@ export function useSupabaseData(table, seedData = [], options = {}) {
     const { data, error } = await supabase.from(table).insert(dbItem).select();
     if (!error && data) {
       setItems(prev => [...prev, fromDb(data[0])]);
+      return { ok: true };
     }
+    return { ok: false, error: error?.message || 'Erreur d’enregistrement' };
   }, [table, toDb, fromDb]);
 
   const update = useCallback(async (id, item) => {

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, lazy, Suspense } from 'react';
+import { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import WelcomePage from './components/WelcomePage';
 import {
   FileText, FolderOpen, ShieldCheck, Layers, Users,
@@ -18,18 +18,19 @@ import MarqueeBanner from './components/MarqueeBanner';
 import BackgroundMusic from './components/BackgroundMusic';
 import SkipToContent from './components/SkipToContent';
 import TabPanelSkeleton from './components/TabPanelSkeleton';
+import { tabImports, prefetchTabPanel, prefetchIdlePopularTabs } from './tabImports';
 
-const MemoSection = lazy(() => import('./components/MemoSection'));
-const GuidePage = lazy(() => import('./components/GuidePage'));
-const AssociationsTab = lazy(() => import('./components/AssociationsTab'));
-const EvenementsTab = lazy(() => import('./components/EvenementsTab'));
-const VideosTab = lazy(() => import('./components/VideosTab'));
-const ComptabiliteTab = lazy(() => import('./components/ComptabiliteTab'));
-const IdeesTab = lazy(() => import('./components/IdeesTab'));
-const AffichesTab = lazy(() => import('./components/AffichesTab'));
-const StockageTab = lazy(() => import('./components/StockageTab'));
-const LocationTab = lazy(() => import('./components/LocationTab'));
-const GuideTab = lazy(() => import('./components/GuideTab'));
+const MemoSection = lazy(tabImports.memo);
+const GuidePage = lazy(tabImports.procedures);
+const AssociationsTab = lazy(tabImports.associations);
+const EvenementsTab = lazy(tabImports.evenements);
+const VideosTab = lazy(tabImports.videos);
+const ComptabiliteTab = lazy(tabImports.comptabilite);
+const IdeesTab = lazy(tabImports.idees);
+const AffichesTab = lazy(tabImports.affiches);
+const StockageTab = lazy(tabImports.stockage);
+const LocationTab = lazy(tabImports.location);
+const GuideTab = lazy(tabImports.guide);
 
 const TABS = [
   { key: 'documents', label: 'Documents', icon: FileText },
@@ -142,6 +143,12 @@ function AppInner() {
     if (tabsRef.current) tabsRef.current.scrollBy({ left: dir * 200, behavior: 'smooth' });
   };
 
+  /* Précharge Mémo + Vidéos (onglets fréquents) quand le navigateur est inactif */
+  useEffect(() => {
+    if (portalView !== 'app') return;
+    return prefetchIdlePopularTabs();
+  }, [portalView]);
+
   if (portalView === 'landing') {
     return <WelcomePage onEnter={enterPortal} />;
   }
@@ -189,10 +196,10 @@ function AppInner() {
 
         {/* Tabs */}
         <div className="flex items-center gap-1">
-          <button type="button" onClick={() => scrollTabs(-1)} className="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-surface-alt hover:bg-copper/15 text-text-muted hover:text-copper transition-all">
-            <ChevronLeft className="w-4 h-4" />
+          <button type="button" onClick={() => scrollTabs(-1)} aria-label="Faire défiler les onglets vers la gauche" className="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-surface-alt hover:bg-copper/15 text-text-muted hover:text-copper transition-all">
+            <ChevronLeft className="w-4 h-4" aria-hidden />
           </button>
-        <div ref={tabsRef} className="tabs-nav flex gap-0.5 sm:gap-1 rounded-2xl border border-border p-1 max-lg:landscape:p-0.5 overflow-x-auto max-w-full scrollbar-thin px-0.5 pb-0.5 scroll-smooth" style={{ scrollbarWidth: 'none' }}>
+        <div ref={tabsRef} className="tabs-nav flex gap-0.5 sm:gap-1 rounded-2xl border border-border p-1 max-lg:landscape:p-0.5 overflow-x-auto max-w-full scrollbar-thin px-0.5 pb-0.5 scroll-smooth" style={{ scrollbarWidth: 'none' }} role="tablist" aria-label="Sections du portail">
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
             const badge = tabBadges[tab.key];
@@ -200,7 +207,12 @@ function AppInner() {
               <button
                 key={tab.key}
                 type="button"
+                role="tab"
+                aria-selected={isActive}
+                id={`tab-${tab.key}`}
                 onClick={() => setActiveTab(tab.key)}
+                onMouseEnter={() => prefetchTabPanel(tab.key)}
+                onFocus={() => prefetchTabPanel(tab.key)}
                 className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-2 max-lg:landscape:px-2 max-lg:landscape:py-1.5 max-lg:landscape:text-[11px] text-[12px] sm:text-[13px] font-semibold rounded-lg sm:rounded-xl transition-all duration-250 cursor-pointer shrink-0 whitespace-nowrap min-h-[40px] max-lg:landscape:min-h-[34px] touch-manipulation snap-start ${
                   isActive
                     ? 'bg-gradient-to-r from-[#1c1c2b] to-[#2a2a3d] text-white shadow-md shadow-black/25 ring-1 ring-white/10'
@@ -218,13 +230,13 @@ function AppInner() {
             );
           })}
         </div>
-          <button type="button" onClick={() => scrollTabs(1)} className="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-surface-alt hover:bg-copper/15 text-text-muted hover:text-copper transition-all">
-            <ChevronRight className="w-4 h-4" />
+          <button type="button" onClick={() => scrollTabs(1)} aria-label="Faire défiler les onglets vers la droite" className="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-surface-alt hover:bg-copper/15 text-text-muted hover:text-copper transition-all">
+            <ChevronRight className="w-4 h-4" aria-hidden />
           </button>
         </div>
 
         {/* Tab content — onglets lourds chargés à la demande (chunks séparés) */}
-        <div className="animate-tab-in" key={activeTab}>
+        <div className="animate-tab-in" key={activeTab} role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
           <Suspense fallback={<TabPanelSkeleton />}>
             {activeTab === 'documents' && (
               <DocumentList grouped={grouped} onEdit={openEdit} onDelete={handleDelete} />

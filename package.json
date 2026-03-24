@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "og:build": "node scripts/generate-og-image.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
