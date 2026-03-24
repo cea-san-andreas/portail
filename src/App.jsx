@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import WelcomePage from './components/WelcomePage';
 import {
   FileText, FolderOpen, ShieldCheck, Layers, Users,
-  Video, DollarSign, CalendarDays, Lightbulb, Image, Database,
+  Video, DollarSign, CalendarDays, Lightbulb, Image, Database, MapPin,
   ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { useDocuments } from './hooks/useDocuments';
@@ -22,6 +22,7 @@ import EvenementsTab from './components/EvenementsTab';
 import IdeesTab from './components/IdeesTab';
 import AffichesTab from './components/AffichesTab';
 import StockageTab from './components/StockageTab';
+import LocationTab from './components/LocationTab';
 import { ToastProvider, useToast } from './components/Toast';
 import ScrollToTop from './components/ScrollToTop';
 import MarqueeBanner from './components/MarqueeBanner';
@@ -38,6 +39,7 @@ const TABS = [
   { key: 'idees', label: 'Idées', icon: Lightbulb },
   { key: 'affiches', label: 'Affiches', icon: Image },
   { key: 'stockage', label: 'Stockage', icon: Database },
+  { key: 'location', label: 'Location', icon: MapPin },
   { key: 'guide', label: 'Aide', icon: Layers },
 ];
 
@@ -227,6 +229,7 @@ function AppInner() {
           {activeTab === 'idees' && <IdeesTab />}
           {activeTab === 'affiches' && <AffichesTab />}
           {activeTab === 'stockage' && <StockageTab />}
+          {activeTab === 'location' && <LocationTab />}
           {activeTab === 'guide' && <GuideTab />}
         </div>
       </main>
