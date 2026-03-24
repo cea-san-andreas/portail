@@ -120,8 +120,7 @@ export default function Header({ onExport, onImport, onAdd, onShowLanding }) {
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span className="hidden sm:inline max-lg:landscape:hidden">Ajouter un document</span>
-              <span className="inline sm:hidden max-lg:landscape:hidden">Document</span>
-              <span className="hidden sm:inline max-lg:landscape:inline">Doc</span>
+              <span className="inline sm:hidden">Document</span>
             </button>
           </div>
         </div>

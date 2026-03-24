@@ -365,9 +365,13 @@ button:focus-visible {
   opacity: 0.85;
 }
 
-/* ─── HEADER DARK ─── */
+/* ─── HEADER & FOOTER — toujours texte blanc ─── */
 header.sticky > div:nth-child(2) {
   background-image: linear-gradient(to right, var(--color-primary-dark), var(--color-primary), var(--color-primary-light)) !important;
+  color: #fff !important;
+}
+footer[class*="bg-gradient"] {
+  color: #fff !important;
 }
 .dark header.sticky > div:nth-child(2) {
   background-image: linear-gradient(to right, rgba(22, 22, 32, 0.92), rgba(30, 30, 42, 0.88), rgba(38, 38, 52, 0.92)) !important;
