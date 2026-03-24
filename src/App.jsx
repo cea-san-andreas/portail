@@ -240,11 +240,11 @@ function AppInner() {
           <div className="flex items-center gap-3">
             <img src={`${import.meta.env.BASE_URL}logo-san-andreas.png`} alt="" className="w-8 h-8 opacity-90" />
             <div>
-              <p className="text-xs font-bold text-white">Portail C.E.A</p>
-              <p className="text-[10px] text-white/70">State of San Andreas — Tous droits réservés</p>
+              <p className="text-xs font-bold" style={{ color: '#fff' }}>Portail C.E.A</p>
+              <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>State of San Andreas — Tous droits réservés</p>
             </div>
           </div>
-          <p className="text-[10px] text-copper-light/80 font-medium">Communication &bull; Événementiel &bull; Association</p>
+          <p className="text-[10px] font-medium" style={{ color: '#d4af37' }}>Communication &bull; Événementiel &bull; Association</p>
         </div>
       </footer>
 
