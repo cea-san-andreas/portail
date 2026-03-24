@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Scale, FileText, PlusCircle, ClipboardCheck, RefreshCw,
-  Heart, XCircle, PartyPopper, Handshake, Building2,
+  Heart, XCircle, PartyPopper, Handshake,
   ChevronRight, AlertTriangle, MapPin, Gift, Users,
   Pencil, Trash2, Plus, X, Save, RotateCcw
 } from 'lucide-react';
@@ -19,7 +19,6 @@ const chapters = [
   { id: 'dissolution', label: 'Dissolution', icon: XCircle },
   { id: 'creation-event', label: 'Création événement', icon: PartyPopper },
   { id: 'participation', label: 'Participation event', icon: Handshake },
-  { id: 'location', label: 'Location biens', icon: Building2 },
   { id: 'associations', label: 'Associations actives', icon: Users },
 ];
 
@@ -523,7 +522,6 @@ export default function GuidePage() {
     dissolution: () => <Dissolution />,
     'creation-event': () => <CreationEvent />,
     participation: () => <ParticipationEvent />,
-    location: () => <LocationBiens data={locsData} />,
     associations: () => <AssociationsActives data={assosData} />,
   };
 
