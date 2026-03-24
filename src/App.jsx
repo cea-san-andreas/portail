@@ -1,10 +1,12 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import WelcomePage from './components/WelcomePage';
 import {
   FileText, FolderOpen, ShieldCheck, Layers, Users,
   Video, DollarSign, CalendarDays, Lightbulb, Image, Database, MapPin,
+  ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { useDocuments } from './hooks/useDocuments';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import Header from './components/Header';
 import StatCard from './components/StatCard';
 import SearchFilters from './components/SearchFilters';
@@ -21,6 +23,10 @@ import IdeesTab from './components/IdeesTab';
 import AffichesTab from './components/AffichesTab';
 import StockageTab from './components/StockageTab';
 import LocationTab from './components/LocationTab';
+import { ToastProvider, useToast } from './components/Toast';
+import ScrollToTop from './components/ScrollToTop';
+import MarqueeBanner from './components/MarqueeBanner';
+import BackgroundMusic from './components/BackgroundMusic';
 
 const TABS = [
   { key: 'documents', label: 'Documents', icon: FileText },
@@ -37,7 +43,7 @@ const TABS = [
   { key: 'guide', label: 'Aide', icon: Layers },
 ];
 
-export default function App() {
+function AppInner() {
   const {
     documents, grouped,
     search, setSearch,
@@ -48,6 +54,9 @@ export default function App() {
     addDocument, updateDocument, deleteDocument,
     importDocuments,
   } = useDocuments();
+
+  const toast = useToast();
+  const searchRef = useRef(null);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDoc, setEditingDoc] = useState(null);
@@ -71,27 +80,63 @@ export default function App() {
     a.download = 'cea-documents.json';
     a.click();
     URL.revokeObjectURL(url);
-  }, [documents]);
+    toast('Export réussi !', 'success');
+  }, [documents, toast]);
 
   const handleImport = useCallback((event) => {
     const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
-      try { importDocuments(JSON.parse(e.target?.result)); } catch {}
+      try {
+        importDocuments(JSON.parse(e.target?.result));
+        toast('Import réussi !', 'success');
+      } catch {
+        toast('Erreur lors de l\'import', 'error');
+      }
     };
     reader.readAsText(file);
     event.target.value = '';
-  }, [importDocuments]);
+  }, [importDocuments, toast]);
 
   const openAdd = () => { setEditingDoc(null); setModalOpen(true); };
   const openEdit = (doc) => { setEditingDoc(doc); setModalOpen(true); };
   const handleSave = (formData) => {
-    if (editingDoc) updateDocument(editingDoc.id, formData);
-    else addDocument(formData);
+    if (editingDoc) {
+      updateDocument(editingDoc.id, formData);
+      toast('Document modifié', 'success');
+    } else {
+      addDocument(formData);
+      toast('Document créé', 'success');
+    }
   };
   const handleDelete = (id) => {
-    if (window.confirm('Supprimer ce document ?')) deleteDocument(id);
+    if (window.confirm('Supprimer ce document ?')) {
+      deleteDocument(id);
+      toast('Document supprimé', 'info');
+    }
+  };
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }, []);
+
+  useKeyboardShortcuts({
+    onNewDocument: openAdd,
+    onFocusSearch: () => searchRef.current?.focus(),
+    onToggleFullscreen: toggleFullscreen,
+  });
+
+  // Badge counts per tab
+  const tabBadges = {
+    documents: documents.length || null,
+    memo: documents.filter(d => d.important).length || null,
+  };
+
+  const tabsRef = useRef(null);
+  const scrollTabs = (dir) => {
+    if (tabsRef.current) tabsRef.current.scrollBy({ left: dir * 200, behavior: 'smooth' });
   };
 
   if (portalView === 'landing') {
@@ -109,6 +154,8 @@ export default function App() {
           setPortalView('landing');
         }}
       />
+
+      <MarqueeBanner />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-6 py-5 sm:py-8 max-lg:landscape:py-3 max-lg:landscape:space-y-3 space-y-5 sm:space-y-7 safe-pb">
         {/* Stats */}
@@ -129,12 +176,18 @@ export default function App() {
           categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} categories={categories}
           typeFilter={typeFilter} setTypeFilter={setTypeFilter} types={types}
           statusFilter={statusFilter} setStatusFilter={setStatusFilter} statuses={statuses}
+          searchRef={searchRef}
         />
 
         {/* Tabs */}
-        <div className="tabs-nav flex gap-0.5 sm:gap-1 rounded-2xl border border-border p-1 max-lg:landscape:p-0.5 overflow-x-auto max-w-full scrollbar-thin -mx-0.5 px-0.5 pb-0.5 snap-x snap-mandatory scroll-pl-2">
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={() => scrollTabs(-1)} className="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-surface-alt hover:bg-copper/15 text-text-muted hover:text-copper transition-all">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        <div ref={tabsRef} className="tabs-nav flex gap-0.5 sm:gap-1 rounded-2xl border border-border p-1 max-lg:landscape:p-0.5 overflow-x-auto max-w-full scrollbar-thin px-0.5 pb-0.5 scroll-smooth" style={{ scrollbarWidth: 'none' }}>
           {TABS.map(tab => {
             const isActive = activeTab === tab.key;
+            const badge = tabBadges[tab.key];
             return (
               <button
                 key={tab.key}
@@ -148,41 +201,55 @@ export default function App() {
               >
                 <tab.icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-copper-light' : 'opacity-90'}`} />
                 {tab.label}
+                {badge != null && (
+                  <span className={`tab-badge ${isActive ? 'bg-copper-light/25 text-copper-light' : 'bg-surface-alt text-text-light'}`}>
+                    {badge}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
+          <button type="button" onClick={() => scrollTabs(1)} className="shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-surface-alt hover:bg-copper/15 text-text-muted hover:text-copper transition-all">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Tab content */}
-        {activeTab === 'documents' && (
-          <DocumentList grouped={grouped} onEdit={openEdit} onDelete={handleDelete} />
-        )}
-        {activeTab === 'memo' && <MemoSection documents={documents} />}
-        {activeTab === 'procedures' && <GuidePage />}
-        {activeTab === 'associations' && <AssociationsTab />}
-        {activeTab === 'evenements' && <EvenementsTab />}
-        {activeTab === 'videos' && <VideosTab />}
-        {activeTab === 'comptabilite' && <ComptabiliteTab />}
-        {activeTab === 'idees' && <IdeesTab />}
-        {activeTab === 'affiches' && <AffichesTab />}
-        {activeTab === 'stockage' && <StockageTab />}
-        {activeTab === 'location' && <LocationTab />}
-        {activeTab === 'guide' && <GuideTab />}
+        <div className="animate-tab-in" key={activeTab}>
+          {activeTab === 'documents' && (
+            <DocumentList grouped={grouped} onEdit={openEdit} onDelete={handleDelete} />
+          )}
+          {activeTab === 'memo' && <MemoSection documents={documents} />}
+          {activeTab === 'procedures' && <GuidePage />}
+          {activeTab === 'associations' && <AssociationsTab />}
+          {activeTab === 'evenements' && <EvenementsTab />}
+          {activeTab === 'videos' && <VideosTab />}
+          {activeTab === 'comptabilite' && <ComptabiliteTab />}
+          {activeTab === 'idees' && <IdeesTab />}
+          {activeTab === 'affiches' && <AffichesTab />}
+          {activeTab === 'stockage' && <StockageTab />}
+          {activeTab === 'location' && <LocationTab />}
+          {activeTab === 'guide' && <GuideTab />}
+        </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-[#111119] via-[#1c1c2b] to-[#2a2a3d] text-white/50 border-t border-white/5 safe-pb max-lg:landscape:py-2">
+      <footer className="bg-gradient-to-r from-[#1a1a2e] via-[#25253d] to-[#2f2f4a] text-white/60 border-t border-copper/15 safe-pb max-lg:landscape:py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-6 max-lg:landscape:py-2 max-lg:landscape:gap-2 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div className="flex items-center gap-3">
-            <img src="/logo-san-andreas.png" alt="" className="w-8 h-8 opacity-60" />
+            <img src={`${import.meta.env.BASE_URL}logo-san-andreas.png`} alt="" className="w-8 h-8 opacity-90" />
             <div>
-              <p className="text-xs font-bold text-white/70">Portail C.E.A</p>
-              <p className="text-[10px] text-white/40">State of San Andreas — Tous droits réservés</p>
+              <p className="text-xs font-bold text-white">Portail C.E.A</p>
+              <p className="text-[10px] text-white/70">State of San Andreas — Tous droits réservés</p>
             </div>
           </div>
-          <p className="text-[10px] text-white/30">Communication &bull; Événementiel &bull; Association</p>
+          <p className="text-[10px] text-copper-light/80 font-medium">Communication &bull; Événementiel &bull; Association</p>
         </div>
       </footer>
+
+      <ScrollToTop />
+      <BackgroundMusic />
 
       <DocumentModal
         isOpen={modalOpen}
@@ -191,5 +258,13 @@ export default function App() {
         editingDoc={editingDoc}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ToastProvider>
+      <AppInner />
+    </ToastProvider>
   );
 }
