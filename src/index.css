@@ -396,14 +396,14 @@ footer[class*="bg-gradient"] {
   .to-\[\#8a8494\] { --tw-gradient-to: var(--color-archive-to) !important; }
 }
 
-.dark .from-\[\#111119\] { --tw-gradient-from: #0a0a0a !important; }
-.dark .from-\[\#1c1c2b\] { --tw-gradient-from: #141414 !important; }
-.dark .via-\[\#1c1c2b\] { --tw-gradient-via: #181818 !important; }
-.dark .to-\[\#1c1c2b\] { --tw-gradient-to: #181818 !important; }
-.dark .to-\[\#2a2a3d\] { --tw-gradient-to: #1e1e1e !important; }
-.dark .from-\[\#1a1a2e\] { --tw-gradient-from: #0c0c0c !important; }
-.dark .via-\[\#25253d\] { --tw-gradient-via: #141414 !important; }
-.dark .to-\[\#2f2f4a\] { --tw-gradient-to: #1a1a1a !important; }
+.dark .from-\[\#111119\] { --tw-gradient-from: #111119 !important; }
+.dark .from-\[\#1c1c2b\] { --tw-gradient-from: #1c1c2b !important; }
+.dark .via-\[\#1c1c2b\] { --tw-gradient-via: #1c1c2b !important; }
+.dark .to-\[\#1c1c2b\] { --tw-gradient-to: #1c1c2b !important; }
+.dark .to-\[\#2a2a3d\] { --tw-gradient-to: #2a2a3d !important; }
+.dark .from-\[\#1a1a2e\] { --tw-gradient-from: #1a1a2e !important; }
+.dark .via-\[\#25253d\] { --tw-gradient-via: #25253d !important; }
+.dark .to-\[\#2f2f4a\] { --tw-gradient-to: #2f2f4a !important; }
 .dark .from-\[\#2d7a4f\] { --tw-gradient-from: #14532d !important; }
 .dark .to-\[\#3d9963\] { --tw-gradient-to: #166534 !important; }
 
